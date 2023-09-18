@@ -1,6 +1,7 @@
 <?php
 
 require_once 'Database.php';
+require_once 'TableCreator.php';
 $hostname = 'localhost';  
 $username = 'root';  
 $password = '';  
@@ -10,20 +11,20 @@ $conn = $dataBase->connect();
 if (!$conn) {
     die("Connection failed.");
 }
+$tableCreator = new TableCreator($dataBase);
 
-$productTableCreateSQL = "
-    CREATE TABLE products (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        price DECIMAL(10, 2) NOT NULL
-    )
-";
-
-// Create the 'products' table
-if ($dataBase->createTable($productTableCreateSQL)) {
-    echo "Table 'products' created successfully.";
+if ($tableCreator->createUsersTable()) {
+    echo "Table 'Users' created successfully.";
 } else {
-    echo "Error creating table.";
+    echo "Error creating 'Users' table.";
 }
+
+if ($tableCreator->createPostsTable()) {
+    echo "Table 'Posts' created successfully.";
+} else {
+    echo "Error creating 'Posts' table.";
+}
+
+$dataBase->disconnect();
 
 ?>
