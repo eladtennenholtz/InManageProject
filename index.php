@@ -2,6 +2,7 @@
 
 require_once 'Database.php';
 require_once 'TableCreator.php';
+require_once 'CurlHandler.php'; 
 $hostname = 'localhost';  
 $username = 'root';  
 $password = '';  
@@ -24,6 +25,9 @@ if ($tableCreator->createPostsTable()) {
 } else {
     echo "Error creating 'Posts' table.";
 }
+$curlHandler = new CurlHandler();
+$curlHandler->fetchAndInsertUsers($conn);
+$curlHandler->fetchAndInsertPosts($conn);
 
 $dataBase->disconnect();
 
