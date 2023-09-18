@@ -10,7 +10,7 @@ $conn = $dataBase->connect();
 if (!$conn) {
     die("Connection failed.");
 }
-// SQL statement to create a 'products' table
+
 $productTableCreateSQL = "
     CREATE TABLE products (
         id INT AUTO_INCREMENT PRIMARY KEY,
