@@ -26,7 +26,62 @@ class Utils {
     }
 
     public static function getLatestPostForBirthdayUsers($conn, $currentMonth) {
-        // Logic to retrieve the latest posts for users with birthdays in the current month
+        try {
+            // SQL query to retrieve users with birthdays in the current month
+            $query = "
+                SELECT users.id, users.name, users.email, MAX(posts.created_at) AS latest_post_date
+                FROM users
+                INNER JOIN posts ON users.id = posts.user_id
+                WHERE users.active = 'yes'
+                    AND MONTH(users.birthdate) = :currentMonth
+                GROUP BY users.id, users.name, users.email
+            ";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':currentMonth', $currentMonth, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $latestPosts = [];
+
+            foreach ($results as $result) {
+                
+                $userId = $result['id'];
+                $latestPostDate = $result['latest_post_date'];
+
+               
+                $postQuery = "
+                    SELECT title, body
+                    FROM posts
+                    WHERE user_id = :userId
+                        AND created_at = :latestPostDate
+                        AND active = 'yes'
+                ";
+
+                
+                $postStmt = $conn->prepare($postQuery);
+                $postStmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+                $postStmt->bindParam(':latestPostDate', $latestPostDate, PDO::PARAM_STR);
+                $postStmt->execute();
+
+               
+                $latestPost = $postStmt->fetch(PDO::FETCH_ASSOC);
+
+               
+                if ($latestPost) {
+                    $result['latest_post'] = $latestPost;
+                } else {
+                    $result['latest_post'] = null;
+                }
+
+               
+                $latestPosts[] = $result;
+            }
+
+            return $latestPosts;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            return [];
+        }
     }
 
     public static function createPostsCountTable($conn) {

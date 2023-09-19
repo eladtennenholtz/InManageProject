@@ -48,6 +48,9 @@ $query = "
 ";
 $result = $dataBase->select($query);
 Utils::displaySocialMediaStyleData($result,$localImagePath);
+$currentMonth = date('n');
+$latestBirthdayPosts = Utils::getLatestPostForBirthdayUsers($conn, $currentMonth);
+echo $latestBirthdayPosts;
 
 $dataBase->disconnect();
 
